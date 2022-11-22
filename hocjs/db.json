@@ -35,53 +35,57 @@
   "users": [
     {
       "id": 1,
-      "name": "Name 01",
-      "email": "email01@gmail.com"
+      "name": "Name 01 - 01",
+      "email": "email01@gmail.com",
+      "status": 1
     },
     {
       "id": 2,
       "name": "Name <b>02</b>",
-      "email": "email02@gmail.com"
+      "email": "email02@gmail.com",
+      "status": 0
     },
     {
+      "name": "Name 03 - 1",
+      "email": "email03@gmail.com",
       "id": 3,
-      "name": "Name 03",
-      "email": "email03@gmail.com"
+      "status": 1
     },
     {
       "name": "Hoàng An",
       "email": "hoangaan@gmail.com",
-      "id": 4
+      "id": 4,
+      "status": 0
     },
     {
-      "name": "gvdfgvfv",
-      "email": "vdfv@gmail.com",
-      "id": 5
+      "name": "grgg - 02",
+      "email": "fgb902@gmail.com",
+      "id": 5,
+      "status": 1
     },
     {
       "name": "bfgbfb",
       "email": "bf@gmail.com",
-      "id": 6
+      "id": 6,
+      "status": 0
     },
     {
       "name": "grgg",
       "email": "fgb@gmail.com",
-      "id": 7
+      "id": 7,
+      "status": 1
     },
     {
-      "name": "dfbb",
-      "email": "gfdgvf@gmail.com",
-      "id": 8
+      "name": "grgg",
+      "email": "fgb@gmail.com",
+      "id": 8,
+      "status": 1
     },
     {
-      "name": "test",
-      "email": "test@gmail.com",
-      "id": 9
-    },
-    {
-      "name": "ggdfgfgh",
-      "email": "bdfbfg@gmail.com",
-      "id": 10
+      "name": "grgg - 02",
+      "email": "fgb902@gmail.com",
+      "id": 9,
+      "status": 1
     }
   ]
 }
