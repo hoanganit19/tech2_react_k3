@@ -1,40 +1,23 @@
-import React from "react";
-import Customers from "./Components/Customers/Customers";
-import Member from "./Components/Props/Member";
+import React, { useState } from "react";
+import Customers from "./Components/Props/Customers";
+import ParentCom from "./Components/Props/ParentCom";
+import Counter from "./Components/State/Counter";
+import Login from "./Components/State/Login";
+import Tech2, { Company, Address } from "./Components/Tech2/Tech2";
 
 export default function App() {
-  const members = {
-    info: {
-      name: "Hoàng An",
-      email: "hoangan.web@gmail.com",
-    },
-    avatar: {
-      src: "https://picsum.photos/800",
-      width: "200",
-      height: "150",
-      alt: "Ảnh của tôi",
-      title: "Tech2",
-      style: {
-        borderRadius: "25px",
-        boxShadow: "3px 3px 3px 5px #ccc",
-      },
-    },
-    posts: [
-      {
-        id: 1,
-        title: "Bài 1",
-      },
-
-      {
-        id: 2,
-        title: "Bài 2",
-      },
-
-      {
-        id: 3,
-        title: "Bài 3",
-      },
-    ],
-  };
-  return <Member {...members} />;
+  return (
+    <div>
+      {/* <Tech2.Company />
+      <Tech2.Address /> */}
+      {/* <Company />
+      <Address /> */}
+      {/* <Customers>
+        <h1>Tạ Hoàng An</h1>
+        <h2>Hà Nội</h2>
+      </Customers> */}
+      {/* <Counter /> */}
+      <Login />
+    </div>
+  );
 }
