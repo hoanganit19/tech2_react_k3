@@ -4,6 +4,7 @@ import ParentCom from "./Components/Props/ParentCom";
 import ConvertCurrency from "./Components/State/ConvertCurrency/ConvertCurrency";
 import Counter from "./Components/State/Counter";
 import Login from "./Components/State/Login";
+import Todos from "./Components/State/Todos";
 import Tech2, { Company, Address } from "./Components/Tech2/Tech2";
 
 export default function App() {
@@ -19,7 +20,8 @@ export default function App() {
       </Customers> */}
       {/* <Counter /> */}
       {/* <Login /> */}
-      <ConvertCurrency />
+      {/* <ConvertCurrency /> */}
+      <Todos />
     </div>
   );
 }

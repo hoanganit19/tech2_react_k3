@@ -13,6 +13,7 @@ export class Login extends Component {
         email: "",
         password: "",
       },
+      btnStatus: true,
     };
   }
 
@@ -50,15 +51,25 @@ export class Login extends Component {
     const dataForm = { ...this.state.form }; //clone object
     dataForm[e.target.name] = e.target.value;
 
-    // console.log(dataForm);
-
     this.setState({
       form: dataForm,
     });
+
+    const { email, password } = dataForm;
+
+    if (email.trim() !== "" && password.trim() !== "") {
+      this.setState({
+        btnStatus: false,
+      });
+    } else {
+      this.setState({
+        btnStatus: true,
+      });
+    }
   };
 
   render() {
-    const { form, errors } = this.state;
+    const { form, errors, btnStatus } = this.state;
     const { email, password } = form;
 
     return (
@@ -98,7 +109,11 @@ export class Login extends Component {
                 )}
               </div>
 
-              <button type="submit" className="btn btn-primary">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={btnStatus}
+              >
                 Login
               </button>
             </form>
