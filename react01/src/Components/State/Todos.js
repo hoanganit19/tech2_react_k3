@@ -174,13 +174,13 @@ export class Todos extends Component {
   };
 
   componentWillUnmount = () => {
-    console.log("componentWillUnmount");
+    // console.log("componentWillUnmount");
     clearInterval(this.interval);
     this.isMount = false;
   };
 
   render() {
-    console.log("Render");
+    // console.log("Render");
     const { todosList, name, users, isLoading, count } = this.state;
     return (
       <div className="container">
