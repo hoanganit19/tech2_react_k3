@@ -4,6 +4,7 @@ import config from "../../Config.json";
 import Modal from "react-bootstrap/Modal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Swal from "sweetalert2";
 
 const { SERVER_API } = config;
 
@@ -25,6 +26,7 @@ export class Users extends Component {
       },
       event: null,
       action: "add",
+      filters: {},
     };
   }
 
@@ -49,8 +51,16 @@ export class Users extends Component {
     console.log(`componentDidUpdate`);
   };
 
-  getUsers = async () => {
-    const res = await fetch(`${SERVER_API}/users`);
+  getUsers = async (filters = {}) => {
+    let url;
+
+    if (Object.keys(filters).length) {
+      url = `${SERVER_API}/users?` + new URLSearchParams(filters).toString();
+    } else {
+      url = `${SERVER_API}/users`;
+    }
+
+    const res = await fetch(url);
     const users = await res.json();
     this.setState({
       users: users,
@@ -216,6 +226,62 @@ export class Users extends Component {
     });
   };
 
+  handleDeleleUser = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        //call api
+        this.deleteUser(id);
+      }
+    });
+  };
+
+  deleteUser = async (id) => {
+    const res = await fetch(`${SERVER_API}/users/${id}`, {
+      method: "DELETE",
+    });
+    if (res.ok) {
+      this.dispatchEvent("delete");
+      toast.success("Xóa thành công");
+    } else {
+      toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau");
+    }
+  };
+
+  handleChangeFilter = (e) => {
+    const filters = { ...this.state.filters };
+
+    if (e.target.name === "status") {
+      if (e.target.value === "active" || e.target.value === "inactive") {
+        filters.status = e.target.value === "active" ? true : false;
+      } else {
+        delete filters.status;
+      }
+    }
+
+    if (e.target.name === "keyword") {
+      filters.q = e.target.value;
+    }
+
+    this.setState({
+      filters: filters,
+    });
+  };
+
+  handleSubmitFilter = (e) => {
+    e.preventDefault();
+    const { filters } = this.state;
+
+    this.getUsers(filters);
+  };
+
   render() {
     const { users, isLoading, showModal, errors, form, action } = this.state;
 
@@ -235,6 +301,36 @@ export class Users extends Component {
         >
           Thêm mới
         </button>
+        <hr />
+        <form onSubmit={this.handleSubmitFilter}>
+          <div className="row">
+            <div className="col-3">
+              <select
+                className="form-select"
+                name="status"
+                onChange={this.handleChangeFilter}
+              >
+                <option value={"all"}>Tất cả trạng thái</option>
+                <option value={"active"}>Kích hoạt</option>
+                <option value={"inactive"}>Chưa kích hoạt</option>
+              </select>
+            </div>
+            <div className="col-7">
+              <input
+                type="search"
+                className="form-control"
+                placeholder="Nhập tên, email..."
+                name="keyword"
+                onChange={this.handleChangeFilter}
+              />
+            </div>
+            <div className="col-2 d-grid">
+              <button type="submit" className="btn btn-primary">
+                Tìm kiếm
+              </button>
+            </div>
+          </div>
+        </form>
         <hr />
         <table className="table table-bordered">
           <thead>
@@ -294,7 +390,13 @@ export class Users extends Component {
                       </a>
                     </td>
                     <td>
-                      <a href="#" className="btn btn-danger">
+                      <a
+                        href="#"
+                        className="btn btn-danger"
+                        onClick={() => {
+                          this.handleDeleleUser(id);
+                        }}
+                      >
                         Xóa
                       </a>
                     </td>
