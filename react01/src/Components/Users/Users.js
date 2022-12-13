@@ -24,6 +24,7 @@ export class Users extends Component {
         email: "",
       },
       event: null,
+      action: "add",
     };
   }
 
@@ -64,17 +65,66 @@ export class Users extends Component {
     });
   };
 
-  handleShowModal = () => {
+  handleShowModal = (id = 0) => {
     this.setModalStatus(true);
+
+    let action = "add";
+
+    if (id > 0) {
+      this.getUser(id); //call api + set state
+      action = "update";
+    } else {
+      this.resetForm();
+    }
+
+    this.setState({
+      action: action,
+    });
+
+    /*
+    Mục đích của state action
+    - Hiển thị tiêu đề trong modal
+    - Xác định sửa, thêm trong phần submit form
+
+    Mục đích của gọi hàm getUser()
+    - Lấy user theo id từ api
+    - Set state để hiển thị lên form
+
+    Mục đích của gọi hàm resetForm()
+    - Reset dữ liệu trong ô input khi mở modal
+    - Reset lỗi trong ô input khi mở modal
+    */
+  };
+
+  resetForm = () => {
+    this.setState({
+      form: {
+        name: "",
+        email: "",
+        status: false,
+      },
+      errors: {},
+    });
+  };
+
+  //Lấy dữ liệu từ api (theo id)
+  getUser = async (id) => {
+    const res = await fetch(`${SERVER_API}/users/${id}`);
+    const data = await res.json();
+
+    this.setState({
+      form: data,
+    });
   };
 
   handleHideModal = () => {
     this.setModalStatus(false);
   };
 
-  handleAdd = (e) => {
+  handleSubmitForm = (e) => {
     e.preventDefault();
-    const { name, email, status } = this.state.form;
+    const { id, name, email, status } = this.state.form;
+    const { action } = this.state; //nhận biết thêm hay sửa
 
     const errors = {};
 
@@ -101,7 +151,11 @@ export class Users extends Component {
         status: parseInt(status) === 1 ? true : false,
       };
 
-      this.postUser(data);
+      if (action == "add") {
+        this.postUser(data);
+      } else {
+        this.updateUser(data, id);
+      }
 
       //Đóng modal
       this.handleHideModal();
@@ -127,6 +181,27 @@ export class Users extends Component {
     }
   };
 
+  //Cập nhật api
+  updateUser = async (data, id) => {
+    if (id !== undefined) {
+      const res = await fetch(`${SERVER_API}/users/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      //console.log(res);
+      if (res.ok) {
+        this.dispatchEvent("update");
+
+        toast.success("Cập nhật thành công");
+      } else {
+        toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau");
+      }
+    }
+  };
+
   handleChangeValue = (e) => {
     const data = { ...this.state.form };
     data[e.target.name] = e.target.value;
@@ -142,9 +217,11 @@ export class Users extends Component {
   };
 
   render() {
-    const { users, isLoading, showModal, errors, form } = this.state;
+    const { users, isLoading, showModal, errors, form, action } = this.state;
 
     const { name, email, status } = form;
+
+    console.log(form);
 
     return (
       <div className="container">
@@ -152,7 +229,9 @@ export class Users extends Component {
         <button
           type="button"
           className="btn btn-primary"
-          onClick={this.handleShowModal}
+          onClick={() => {
+            this.handleShowModal();
+          }}
         >
           Thêm mới
         </button>
@@ -203,7 +282,14 @@ export class Users extends Component {
                       )}
                     </td>
                     <td>
-                      <a href="#" className="btn btn-warning">
+                      <a
+                        href="#"
+                        className="btn btn-warning"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          this.handleShowModal(id);
+                        }}
+                      >
                         Sửa
                       </a>
                     </td>
@@ -254,10 +340,12 @@ export class Users extends Component {
         </div>
         <Modal show={showModal} onHide={this.handleHideModal}>
           <Modal.Header closeButton>
-            <Modal.Title>Thêm người dùng</Modal.Title>
+            <Modal.Title>
+              {action === "update" ? "Cập nhật người dùng" : "Thêm người dùng"}
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <form onSubmit={this.handleAdd}>
+            <form onSubmit={this.handleSubmitForm}>
               <div className="mb-3">
                 <label>Tên</label>
                 <input
@@ -266,6 +354,7 @@ export class Users extends Component {
                   placeholder="Tên..."
                   name="name"
                   onChange={this.handleChangeValue}
+                  value={name}
                 />
                 {errors.name && (
                   <div className="invalid-feedback">{errors.name}</div>
@@ -279,6 +368,7 @@ export class Users extends Component {
                   placeholder="Email..."
                   name="email"
                   onChange={this.handleChangeValue}
+                  value={email}
                 />
                 {errors.email && (
                   <div className="invalid-feedback">{errors.email}</div>
@@ -290,7 +380,7 @@ export class Users extends Component {
                   className="form-select"
                   onChange={this.handleChangeValue}
                   name="status"
-                  value={status}
+                  value={status ? 1 : 0}
                 >
                   <option value={0}>Chưa kích hoạt</option>
                   <option value={1}>Kích hoạt</option>

@@ -1,0 +1,9 @@
+Xây dựng chức năng cập nhật người dùng 
+
+1. Xây dựng hàm lấy user từ id: getUser(id) => get api 
+
+2. Xây dựng hàm update user lên api: updateUser(data, id) => put api
+
+3. Click vào nút sửa => Show modal (Đi kèm với id cần sửa) => gọi hàm getUser(id) => Lấy được thông tin user => setState => Hiển thị state vào các input của modal
+
+4. Xử lý submit form => giống như phần thêm => gọi hàm updateUser(data, id)
