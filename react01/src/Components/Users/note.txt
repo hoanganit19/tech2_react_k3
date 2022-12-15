@@ -26,3 +26,18 @@ filters = {
 }
 
 => status=true&q=a
+
+Thuật toán phân trang 
+
+1. Lấy tổng số lượng bản ghi
+
+2. Tính tổng số trang: Tổng số bản ghi / giới hạn bản ghi (limit, perPage)
+
+3. Render phân trang: 1 - 2 - 3 - 4
+
+4. Xử lý chuyển trang khi click vào 1-2-3-4
+
+Buổi sau: 
+
+- Xây dựng Higher Order Components
+- React.memo

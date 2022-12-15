@@ -27,19 +27,43 @@ export class Users extends Component {
       event: null,
       action: "add",
       filters: {},
+      paginate: {
+        maxPage: 0,
+        currentPage: 1,
+      },
+      deleteCount: 0,
     };
+
+    this.perPage = 3;
+
+    this.checkAllRef = React.createRef(); //sing ref
+    this.checkItemRef = []; //Tạo multi ref
+
+    this.deleteIds = [];
   }
 
   componentDidMount = () => {
     //call api
-    this.getUsers();
+    const { currentPage } = this.state.paginate;
+    this.getUsers({}, this.perPage, currentPage);
+
+    //tạo ref
+    this.checkItemRef = [];
+    for (let i = 1; i <= this.perPage; i++) {
+      this.checkItemRef.push(React.createRef());
+    }
   };
 
   componentDidUpdate = (prevProps, prevState) => {
     //console.log(prevProps, this.props);
     //console.log(prevState);
     if (prevState.event !== this.state.event) {
-      this.getUsers();
+      let { currentPage } = this.state.paginate;
+
+      this.getUsers({}, this.perPage, currentPage);
+
+      this.checkAllRef.current.checked = false;
+
       this.setState({
         event: null,
       });
@@ -48,23 +72,39 @@ export class Users extends Component {
     /*
     - Chạy từ lần render thứ 2 trở đi
     */
-    console.log(`componentDidUpdate`);
+    //console.log(`componentDidUpdate`);
   };
 
-  getUsers = async (filters = {}) => {
+  getUsers = async (filters = {}, limit = 3, page = 1) => {
     let url;
 
     if (Object.keys(filters).length) {
-      url = `${SERVER_API}/users?` + new URLSearchParams(filters).toString();
+      url =
+        `${SERVER_API}/users?` +
+        new URLSearchParams(filters).toString() +
+        `&_limit=${limit}&_page=${page}`;
     } else {
-      url = `${SERVER_API}/users`;
+      url = `${SERVER_API}/users?_limit=${limit}&_page=${page}`;
     }
 
     const res = await fetch(url);
+
     const users = await res.json();
+
+    //Lấy tổng số bản ghi
+    const totalRows = res.headers.get("x-total-count");
+
+    //Tính tổng số trang
+    const maxPage = Math.ceil(totalRows / limit);
+
+    const paginate = { ...this.state.paginate };
+
+    paginate.maxPage = maxPage;
+
     this.setState({
       users: users,
       isLoading: false,
+      paginate: paginate,
     });
     //console.log(users);
   };
@@ -243,13 +283,22 @@ export class Users extends Component {
     });
   };
 
-  deleteUser = async (id) => {
+  deleteUser = async (id, isAnyDelete = false) => {
     const res = await fetch(`${SERVER_API}/users/${id}`, {
       method: "DELETE",
     });
     if (res.ok) {
-      this.dispatchEvent("delete");
-      toast.success("Xóa thành công");
+      if (!isAnyDelete) {
+        const paginate = this.state.paginate;
+        paginate.currentPage = 1;
+        this.setState({
+          paginate: paginate,
+        });
+
+        this.dispatchEvent("delete");
+
+        toast.success("Xóa thành công");
+      }
     } else {
       toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau");
     }
@@ -282,12 +331,149 @@ export class Users extends Component {
     this.getUsers(filters);
   };
 
+  renderPaginate = () => {
+    const { maxPage, currentPage } = this.state.paginate;
+
+    const pageItems = [];
+
+    const goPaginate = (page) => {
+      const paginate = { ...this.state.paginate };
+      paginate.currentPage = page;
+      this.setState({
+        paginate: paginate,
+      });
+
+      //Re-render table
+      this.dispatchEvent("paginate");
+    };
+
+    for (let page = 1; page <= maxPage; page++) {
+      pageItems.push(
+        <li
+          className={`page-item ${page == currentPage ? "active" : ""}`}
+          key={page}
+        >
+          <a
+            className="page-link"
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              goPaginate(page);
+            }}
+          >
+            {page}
+          </a>
+        </li>
+      );
+    }
+
+    return (
+      maxPage > 0 && (
+        <nav aria-label="Page navigation example">
+          <ul className="pagination">
+            <li className="page-item">
+              <a className="page-link" href="#">
+                Trước
+              </a>
+            </li>
+            {pageItems}
+            <li className="page-item">
+              <a className="page-link" href="#">
+                Sau
+              </a>
+            </li>
+          </ul>
+        </nav>
+      )
+    );
+  };
+
+  handleCheckAll = (e) => {
+    const checkStatus = e.target.checked;
+    if (!checkStatus) {
+      this.deleteIds = [];
+    }
+    let count = 0;
+    this.checkItemRef.forEach((checkbox) => {
+      if (checkbox.current !== null) {
+        checkbox.current.checked = checkStatus;
+        if (checkStatus) {
+          count++;
+          this.deleteIds.push(checkbox.current.value);
+        }
+      }
+    });
+
+    this.setState({
+      deleteCount: count,
+    });
+  };
+
+  handleCheckItem = (e) => {
+    //Xử lý khi bỏ check
+    if (!e.target.checked) {
+      this.setState((prevState) => ({
+        deleteCount: prevState.deleteCount - 1,
+      }));
+
+      this.checkAllRef.current.checked = false;
+
+      const index = this.deleteIds.findIndex((item) => item == e.target.value);
+      this.deleteIds.splice(index, 1);
+
+      return;
+    } else {
+      this.setState((prevState) => ({
+        deleteCount: prevState.deleteCount + 1,
+      }));
+      this.deleteIds.push(e.target.value);
+    }
+
+    const status = this.checkItemRef.every((checkbox) => {
+      return checkbox.current.checked == true;
+    });
+
+    this.checkAllRef.current.checked = status;
+  };
+
+  handleAnyDelete = () => {
+    const { deleteCount } = this.state;
+    if (deleteCount > 0) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          //call api
+          this.deleteIds = [...new Set(this.deleteIds)]; //loại bỏ phần tử trùng
+
+          this.deleteIds.forEach((id) => {
+            this.deleteUser(id, true);
+          });
+
+          const paginate = { ...this.state.paginate };
+          paginate.currentPage = 1;
+          this.setState({
+            paginate: paginate,
+          });
+
+          toast.success("Xóa người dùng thành công");
+          this.dispatchEvent("delete");
+        }
+      });
+    }
+  };
+
   render() {
-    const { users, isLoading, showModal, errors, form, action } = this.state;
+    const { users, isLoading, showModal, errors, form, action, deleteCount } =
+      this.state;
 
     const { name, email, status } = form;
-
-    console.log(form);
 
     return (
       <div className="container">
@@ -336,7 +522,11 @@ export class Users extends Component {
           <thead>
             <tr>
               <th scope="col" width="5%">
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  onChange={this.handleCheckAll}
+                  ref={this.checkAllRef}
+                />
               </th>
               <th scope="col">Tên</th>
               <th scope="col">Email</th>
@@ -358,11 +548,16 @@ export class Users extends Component {
               </tr>
             ) : (
               users.length > 0 &&
-              users.map(({ id, name, email, status }) => {
+              users.map(({ id, name, email, status }, index) => {
                 return (
                   <tr key={id}>
                     <td scope="row">
-                      <input type="checkbox" />
+                      <input
+                        type="checkbox"
+                        onChange={this.handleCheckItem}
+                        ref={this.checkItemRef[index]}
+                        value={id}
+                      />
                     </td>
                     <td>{name}</td>
                     <td>{email}</td>
@@ -407,38 +602,14 @@ export class Users extends Component {
           </tbody>
         </table>
         <div className="d-flex justify-content-between">
-          <button type="button" className="btn btn-danger">
-            Xóa đã chọn (0)
+          <button
+            type="button"
+            className={`btn btn-danger ${deleteCount == 0 && "disabled"}`}
+            onClick={this.handleAnyDelete}
+          >
+            Xóa đã chọn ({deleteCount})
           </button>
-          <nav aria-label="Page navigation example">
-            <ul className="pagination">
-              <li className="page-item">
-                <a className="page-link" href="#">
-                  Previous
-                </a>
-              </li>
-              <li className="page-item">
-                <a className="page-link" href="#">
-                  1
-                </a>
-              </li>
-              <li className="page-item">
-                <a className="page-link" href="#">
-                  2
-                </a>
-              </li>
-              <li className="page-item">
-                <a className="page-link" href="#">
-                  3
-                </a>
-              </li>
-              <li className="page-item">
-                <a className="page-link" href="#">
-                  Next
-                </a>
-              </li>
-            </ul>
-          </nav>
+          {this.renderPaginate()}
         </div>
         <Modal show={showModal} onHide={this.handleHideModal}>
           <Modal.Header closeButton>
