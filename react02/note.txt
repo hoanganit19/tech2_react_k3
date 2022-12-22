@@ -21,3 +21,4 @@ Giải pháp quản lý Global State
 1. Redux (Thư viện ngoài)
 2. React Context (tích hợp sẵn vào React)
 3. React Query
+
