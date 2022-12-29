@@ -14,6 +14,7 @@ export const httpClient = (serverApi = SERVER_API) => {
 
       if (Object.keys(params).length) {
         url = url + "?" + new URLSearchParams(params).toString();
+        //category_id=1&q=abc
       }
 
       const options = {

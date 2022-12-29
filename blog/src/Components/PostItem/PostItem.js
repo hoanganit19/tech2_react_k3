@@ -1,26 +1,27 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
+import { Url } from "../../Services/Helpers/Url";
 import "./PostItem.scss";
 
+const url = new Url();
+
 export class PostItem extends Component {
+  constructor(props) {
+    super(props);
+  }
   render() {
+    const { id, title, thumbnail, excerpt } = this.props;
+
     return (
       <div className="col-3">
         <div className="post-item">
-          <a href="#">
-            <img
-              src="https://i.picsum.photos/id/825/500/400.jpg?hmac=D-Cv4D8T_Wlv2nEkUxcPTB-z5UFBwpd2yWd0dXeCglU"
-              alt=""
-            />
-          </a>
+          <Link to={url.getPost(id)}>
+            <img src={thumbnail} alt="" />
+          </Link>
           <h2 className="title">
-            <a href="#">Bài viết 01</a>
+            <Link to={url.getPost(id)}>{title}</Link>
           </h2>
-          <p>
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Suscipit
-            corrupti debitis molestiae deleniti! Consequatur doloremque
-            distinctio vitae fugit maiores commodi ab impedit numquam esse a,
-            sed ex et, beatae eaque.
-          </p>
+          <p>{excerpt}</p>
         </div>
       </div>
     );

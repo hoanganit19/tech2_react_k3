@@ -1,5 +1,7 @@
 export class Url {
-  getPost = (id) => {};
+  getPost = (id) => {
+    return `/chuyen-muc/chi-tiet/${id}`;
+  };
 
   getCategory = (id) => {};
 }

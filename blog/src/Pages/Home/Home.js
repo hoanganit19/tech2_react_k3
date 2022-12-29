@@ -1,42 +1,46 @@
 import React, { Component } from "react";
 import "./Home.scss";
-import { httpClient } from "../../Services/Helpers/httpClient";
+
 import PostItem from "../../Components/PostItem/PostItem";
 
+import { withContext } from "../../Services/Context/withContext";
+
 export class Home extends Component {
-  // getPosts = async () => {
-  //   const response = await client.get("/todos", {
-  //     _limit: 10,
-  //     _page: 1,
-  //   });
-  //   console.log(response);
-  // };
-  // componentDidMount = () => {
-  //   this.getPosts();
-  // };
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount = () => {
+    const { getPosts } = this.props.dispatch;
+    getPosts();
+  };
 
   render() {
+    const { isLoading, postList } = this.props.data.posts;
+
     return (
       <section className="posts">
         <div className="container">
           <h1>Bài viết mới nhất</h1>
           <hr />
           <div className="posts-list">
-            <div className="row">
-              <PostItem />
-              <PostItem />
-              <PostItem />
-              <PostItem />
-              <PostItem />
-              <PostItem />
-              <PostItem />
-              <PostItem />
-            </div>
-            <div className="loadmore text-center pt-5">
-              <button type="button" className="btn btn-danger">
-                Xem thêm
-              </button>
-            </div>
+            {isLoading ? (
+              <p>Loading...</p>
+            ) : (
+              <>
+                <div className="row">
+                  {postList.map((post) => (
+                    <PostItem key={post.id} {...post} />
+                  ))}
+                </div>
+
+                <div className="loadmore text-center pt-5">
+                  <button type="button" className="btn btn-danger">
+                    Xem thêm
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -44,4 +48,4 @@ export class Home extends Component {
   }
 }
 
-export default Home;
+export default withContext(Home);

@@ -1,14 +1,66 @@
 import React, { Component, createContext } from "react";
 
+import { httpClient } from "../Helpers/httpClient";
+
 export const StateContext = createContext();
+
+const client = httpClient();
 
 export class StateProvider extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      posts: {
+        postList: [],
+        isLoading: true,
+      },
+    };
 
-    this.dispatch = {};
+    this.dispatch = {
+      getPosts: this.getPosts,
+    };
   }
+
+  getPosts = async (
+    categoryId = 0,
+    sort = "id",
+    order = "desc",
+    keywords = null,
+    limit = 8,
+    page = 1
+  ) => {
+    /*
+    Phương thức lấy danh sách bài viết từ server
+    Nếu categoryId = 0 => Lấy tất cả bài viết
+    Nếu categoryId != 0 => Lọc bài viết theo chuyên mục
+    */
+
+    const params = {
+      _sort: sort,
+      _order: order,
+      _limit: limit,
+      _page: page,
+    };
+    if (categoryId !== 0) {
+      params.category_id = categoryId;
+    }
+
+    if (keywords !== null) {
+      params.q = keywords;
+    }
+
+    const res = await client.get("/posts", params);
+    const postList = res.data;
+
+    const posts = {
+      isLoading: false,
+      postList: postList,
+    };
+
+    this.setState({
+      posts: posts,
+    });
+  };
 
   render() {
     const { children } = this.props;

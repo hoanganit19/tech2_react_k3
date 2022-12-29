@@ -5,13 +5,13 @@ import {
   useSearchParams,
 } from "react-router-dom";
 
-export const withRouter = (Comment) => (props) => {
+export const withRouter = (Component) => (props) => {
   const params = useParams();
   const search = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
   return (
-    <Comment
+    <Component
       params={params}
       {...props}
       search={search}
