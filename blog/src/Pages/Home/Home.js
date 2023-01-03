@@ -5,14 +5,35 @@ import PostItem from "../../Components/PostItem/PostItem";
 
 import { withContext } from "../../Services/Context/withContext";
 
+import config from "../../Configs/Config.json";
+import LoadMore from "../../Components/LoadMore/LoadMore";
+
+const { POST_LIMIT } = config;
+
 export class Home extends Component {
   constructor(props) {
     super(props);
+
+    this.limitLoadMore = POST_LIMIT;
+
+    this.state = {
+      limit: POST_LIMIT,
+    };
   }
 
   componentDidMount = () => {
     const { getPosts } = this.props.dispatch;
-    getPosts();
+    getPosts(0, "id", "desc", null, POST_LIMIT);
+  };
+
+  handleLoadMore = async () => {
+    this.limitLoadMore += POST_LIMIT;
+    const { getPosts } = this.props.dispatch;
+    getPosts(0, "id", "desc", null, this.limitLoadMore);
+    // await this.setState({
+    //   limit: this.state.limit + POST_LIMIT,
+    // });
+    console.log(this.state.limit);
   };
 
   render() {
@@ -34,11 +55,7 @@ export class Home extends Component {
                   ))}
                 </div>
 
-                <div className="loadmore text-center pt-5">
-                  <button type="button" className="btn btn-danger">
-                    Xem thêm
-                  </button>
-                </div>
+                <LoadMore onLoadMore={this.handleLoadMore} />
               </>
             )}
           </div>

@@ -1,3 +1,4 @@
 {
-    "SERVER_API": "http://localhost:3004"
+    "SERVER_API": "http://localhost:3004",
+    "POST_LIMIT": 4
 }

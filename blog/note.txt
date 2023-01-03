@@ -40,3 +40,19 @@ Các bước triển khai
 fetch('url', {
     method: 'post'
 })
+
+Trang chi tiết blog 
+
+1. Xác định được api
+
+2. Viết hàm call api
+
++ Dùng httpClient để gọi 
++ setState
+
+3. Render dữ liệu: Render state 
+
+4. Xử lý tối ưu: 
+
+- Loading 
+- 404
