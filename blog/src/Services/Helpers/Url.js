@@ -4,4 +4,8 @@ export class Url {
   };
 
   getCategory = (id) => {};
+
+  getSearch = (keyword) => {
+    return `/tim-kiem?keyword=${keyword}`;
+  };
 }

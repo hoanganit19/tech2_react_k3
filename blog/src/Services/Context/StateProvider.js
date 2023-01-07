@@ -12,6 +12,7 @@ export class StateProvider extends Component {
     this.state = {
       posts: {
         postList: [],
+        postCount: 0,
         isLoading: true,
       },
     };
@@ -49,12 +50,13 @@ export class StateProvider extends Component {
       params.q = keywords;
     }
 
-    const res = await client.get("/posts", params);
-    const postList = res.data;
+    const { res, data: postList } = await client.get("/posts", params);
+    const postCount = res.headers.get("x-total-count");
 
     const posts = {
       isLoading: false,
       postList: postList,
+      postCount: postCount,
     };
 
     this.setState({

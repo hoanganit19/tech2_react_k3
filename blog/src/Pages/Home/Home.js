@@ -37,7 +37,7 @@ export class Home extends Component {
   };
 
   render() {
-    const { isLoading, postList } = this.props.data.posts;
+    const { isLoading, postList, postCount } = this.props.data.posts;
 
     return (
       <section className="posts">
@@ -55,7 +55,11 @@ export class Home extends Component {
                   ))}
                 </div>
 
-                <LoadMore onLoadMore={this.handleLoadMore} />
+                <LoadMore
+                  onLoadMore={this.handleLoadMore}
+                  postCount={postCount}
+                  postLoaded={this.limitLoadMore}
+                />
               </>
             )}
           </div>

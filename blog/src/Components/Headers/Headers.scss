@@ -1,10 +1,40 @@
 .header{
     border-bottom: 1px solid #efefef;
     .menu{
-        a{
-            color: #333;
-            font-weight: bold;
-            text-transform: uppercase;
+        ul{
+            list-style: none;
+            li{
+                position: relative;
+                a{
+                    color: #333;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                }
+                &:hover{
+                    > ul{
+                        display: block;
+                    }
+                }
+            }
+            ul{
+                display: none;
+                position: absolute;
+                min-width: 300px;
+                left: 0;
+                top: 100%;
+                background-color:palevioletred;
+                z-index: 100;
+                a{
+                    color: #fff;
+                    display: block;
+                    padding: 5px 0;
+                }
+                ul{
+                    left: 100%;
+                    top: 0;
+                }
+            }
         }
     }
+       
 }

@@ -4,6 +4,9 @@ import { withContext } from "../../Services/Context/withContext";
 import { withRouter } from "../../Services/Helpers/withRouter";
 import { httpClient } from "../../Services/Helpers/httpClient";
 import Error404 from "../../Errors/Error404";
+import LoadMore from "../../Components/LoadMore/LoadMore";
+import config from "../../Configs/Config.json";
+const { POST_LIMIT } = config;
 
 const client = httpClient();
 
@@ -16,15 +19,25 @@ export class Posts extends Component {
     };
     this.id = this.props.params.id;
     this.dispatch = this.props.dispatch;
+
+    this.limitLoadMore = POST_LIMIT;
   }
 
   componentDidMount = () => {
-    this.dispatch.getPosts(this.id);
+    const { getPosts } = this.props.dispatch;
+    getPosts(this.id, "id", "desc", null, POST_LIMIT);
+
     this.getCategory();
   };
 
+  handleLoadMore = async () => {
+    this.limitLoadMore += POST_LIMIT;
+    const { getPosts } = this.props.dispatch;
+    getPosts(this.id, "id", "desc", null, this.limitLoadMore);
+  };
+
   render() {
-    const { isLoading, postList } = this.props.data.posts;
+    const { isLoading, postList, postCount } = this.props.data.posts;
     const { status, category } = this.state;
     const { name: categoryName } = category;
     console.log(status);
@@ -55,11 +68,11 @@ export class Posts extends Component {
                         </div>
                       )}
 
-                      <div className="loadmore text-center pt-5">
-                        <button type="button" className="btn btn-danger">
-                          Xem thêm
-                        </button>
-                      </div>
+                      <LoadMore
+                        onLoadMore={this.handleLoadMore}
+                        postCount={postCount}
+                        postLoaded={this.limitLoadMore}
+                      />
                     </>
                   )}
                 </div>
