@@ -56,3 +56,14 @@ Trang chi tiết blog
 
 - Loading 
 - 404
+
+Authentication => Xác thực (Đăng nhập)
+
+Authorization => Phân quyền (Được làm gì)
+
+API: 
+
+http://localhost:3004 => api dữ liệu chung của blog 
+http://localhost:3005 => api users (Dùng làm authentication)
+
+Middleware => Bộ lọc trung gian từ route tới component

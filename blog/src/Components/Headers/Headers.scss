@@ -36,5 +36,33 @@
             }
         }
     }
+
+    .account{
+        position: relative;
+        > p {
+            cursor: pointer;
+        }
+        .account-list{
+            position: absolute;
+            top: 105%;
+            left: 0;
+            min-width: 200px;
+            background: brown;
+            padding: 10px;
+            display: none;
+            p{
+                margin-bottom: 5px;
+                a{
+                    color: #fff;
+                }
+            }
+        }
+
+        &:hover{
+            .account-list{
+                display: block;
+            }
+        }
+    }
        
 }

@@ -2,9 +2,15 @@ import React, { Component, createContext } from "react";
 
 import { httpClient } from "../Helpers/httpClient";
 
+import config from "../../Configs/Config.json";
+
 export const StateContext = createContext();
 
+const { SERVER_API_AUTH } = config;
+
 const client = httpClient();
+
+const clientAuth = httpClient(SERVER_API_AUTH);
 
 export class StateProvider extends Component {
   constructor(props) {
@@ -15,12 +21,27 @@ export class StateProvider extends Component {
         postCount: 0,
         isLoading: true,
       },
+      auth: {
+        user: {}, //lưu trữ thông tin user đã đăng nhập
+        isLoading: true, //kiểm tra trạng thái loading
+        isAuthenticated: false, //kiểm tra trạng thái login
+      },
     };
 
     this.dispatch = {
       getPosts: this.getPosts,
+      setAuth: this.setAuth,
     };
   }
+
+  setAuth = async (accessToken) => {
+    localStorage.setItem("accessToken", accessToken);
+    const data = { ...this.state.auth };
+    data.isAuthenticated = true;
+    this.setState({
+      auth: data,
+    });
+  };
 
   getPosts = async (
     categoryId = 0,
