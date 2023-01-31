@@ -16,6 +16,10 @@ export class Editor extends Component {
     };
   }
 
+  componentDidMount = () => {
+    this.editorRef.current.dataset.id = Math.random().toString(16).slice(2);
+  };
+
   handlePost = () => {
     const content = this.editorRef.current.innerHTML;
     console.log(content);
@@ -27,22 +31,55 @@ export class Editor extends Component {
     const content = this.editorRef.current.innerHTML;
     if (document.getSelection) {
       var selection = document.getSelection(); //Nội dung đã chọn
-      selectionStart = selection.anchorOffset;
-      selectionEnd = selection.focusOffset;
-      selectText = content.slice(selectionStart, selectionEnd);
-      //console.log(selectionStart, selectionEnd);
 
-      //   const textFromStart = content.slice(0, selectionStart);
-      //   console.log(textFromStart.split("\n"));
+      var container = document.createElement("div");
+
+      const range = selection.getRangeAt(0);
+
+      container.appendChild(range.cloneContents());
+
+      selectText = container.innerHTML;
+      selectionStart = content.indexOf(selectText);
+      selectionEnd = selectionStart + selectText.length;
 
       let selectionStatus = false;
-      //console.log(selectionStart, selectionEnd);
+
       if (selectionStart !== selectionEnd) {
         selectionStatus = true;
       }
 
       this.setState({ isSelection: selectionStatus });
+
+      if (selectText !== "") {
+        const styleObj = this.getParents(range.startContainer);
+        if (styleObj) {
+          const selectHtml = styleObj.outerHTML;
+          console.log(selectHtml, selectText);
+        }
+      }
     }
+  };
+
+  getParents = (currentObj) => {
+    currentObj = currentObj.parentElement;
+    const containerId = this.editorRef.current.dataset.id;
+    let id = null;
+    if (
+      currentObj.dataset !== undefined &&
+      Object.keys(currentObj.dataset).length > 0
+    ) {
+      id = currentObj.dataset.id;
+    }
+
+    let result = null;
+
+    while (id != containerId) {
+      result = currentObj;
+      currentObj = currentObj.parentElement;
+      id = currentObj.dataset.id;
+    }
+
+    return result;
   };
 
   handleMouseDown = (e) => {
@@ -72,6 +109,30 @@ export class Editor extends Component {
     //console.log(selectText, selectionStart, selectionEnd);
   };
 
+  handleItalicText = () => {
+    const content = this.editorRef.current.innerHTML;
+    const beforeContent = content.slice(0, selectionStart);
+    const afterContent = content.slice(selectionEnd, content.length);
+
+    this.editorRef.current.innerHTML = `${beforeContent}<i>${selectText}</i>${afterContent}`;
+
+    this.setState({
+      isSelection: false,
+    });
+  };
+
+  handleUnderlineText = () => {
+    const content = this.editorRef.current.innerHTML;
+    const beforeContent = content.slice(0, selectionStart);
+    const afterContent = content.slice(selectionEnd, content.length);
+
+    this.editorRef.current.innerHTML = `${beforeContent}<u>${selectText}</u>${afterContent}`;
+
+    this.setState({
+      isSelection: false,
+    });
+  };
+
   render() {
     const { isSelection, offsetX, offsetY } = this.state;
     //console.log(isSelection, offsetX, offsetY);
@@ -91,8 +152,18 @@ export class Editor extends Component {
               style={{ left: offsetX + "px", top: offsetY + "px" }}
             >
               <button onClick={this.handleBoldText}>B</button>
-              <button>I</button>
-              <button>U</button>
+              <button
+                onClick={this.handleItalicText}
+                style={{ fontStyle: "italic" }}
+              >
+                I
+              </button>
+              <button
+                onClick={this.handleUnderlineText}
+                style={{ textDecoration: "underline" }}
+              >
+                U
+              </button>
             </div>
           )}
         </div>
