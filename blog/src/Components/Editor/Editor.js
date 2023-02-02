@@ -2,8 +2,11 @@ import React, { Component, createRef } from "react";
 import "./Editor.scss";
 
 let selectText = "";
+let selectHtml = "";
 let selectionStart = 0;
 let selectionEnd = 0;
+let styleObj;
+let styleArr = [];
 
 export class Editor extends Component {
   constructor(props) {
@@ -50,13 +53,16 @@ export class Editor extends Component {
 
       this.setState({ isSelection: selectionStatus });
 
-      if (selectText !== "") {
-        const styleObj = this.getParents(range.startContainer);
-        if (styleObj) {
-          const selectHtml = styleObj.outerHTML;
-          console.log(selectHtml, selectText);
-        }
-      }
+      selectHtml = "";
+
+      // if (selectText !== "") {
+      //   styleObj = this.getParents(range.startContainer);
+      //   if (styleObj) {
+      //     selectHtml = styleObj.outerHTML;
+      //     selectionStart = content.indexOf(selectHtml);
+      //     selectionEnd = selectionStart + selectHtml.length;
+      //   }
+      // }
     }
   };
 
@@ -85,12 +91,12 @@ export class Editor extends Component {
   handleMouseDown = (e) => {
     //console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
     //console.log(e);
-    const offsetX = e.nativeEvent.offsetX;
-    const offsetY = e.nativeEvent.offsetY;
+    const offsetX = e.nativeEvent.layerX;
+    const offsetY = e.nativeEvent.layerY - 60;
     this.setState({ isSelection: false });
     this.setState({
-      offsetX: 0,
-      offsetY,
+      offsetX: offsetX,
+      offsetY: offsetY,
     });
   };
 
@@ -100,7 +106,72 @@ export class Editor extends Component {
     const beforeContent = content.slice(0, selectionStart);
     const afterContent = content.slice(selectionEnd, content.length);
 
-    this.editorRef.current.innerHTML = `${beforeContent}<b>${selectText}</b>${afterContent}`;
+    console.log(selectText, selectionStart, selectionEnd);
+
+    const styleBold = {
+      text: selectText,
+      start: selectionStart,
+      end: selectionEnd,
+      style: "bold",
+    };
+
+    let type = null;
+
+    styleArr.forEach((item) => {
+      //Trường hợp 1: start === selectionStart và end === selectionEnd
+      if (item.start == selectionStart && item.end == selectionEnd) {
+        type = 1;
+      }
+
+      //Trường hợp 2: selectionStart>=start && selectionEnd <= end
+      if (
+        (selectionStart > item.start && selectionEnd < item.end) ||
+        (selectionStart >= item.start && selectionEnd < item.end) ||
+        (selectionStart > item.start && selectionEnd <= item.end)
+      ) {
+        type = 2;
+      }
+
+      //Trường hợp 3:
+      if (selectionStart < item.start || selectionEnd > item.end) {
+        type = 3;
+      }
+      console.log(selectionStart, item.start);
+      console.log(selectionEnd, item.end);
+    });
+
+    styleArr.push(styleBold);
+
+    console.log(type);
+
+    console.log(styleArr);
+
+    //console.log(selectHtml);
+
+    // let boldHtml = `<b>${selectText}</b>`;
+
+    // console.log(selectHtml);
+
+    // if (selectHtml != "") {
+    //   const selectHtmlInner = styleObj.innerText;
+    //   if (selectHtmlInner !== selectText) {
+    //     selectHtml = selectHtml.replace(selectText, "");
+    //     selectionEnd = selectionStart + selectHtml.length;
+    //   }
+
+    //   console.log(beforeContent, boldHtml, afterContent);
+
+    //   // console.log(selectHtml);
+
+    //   // console.log(selectionStart, selectionEnd);
+
+    //   //boldHtml = selectText + selectHtml;
+    //   // console.log("ok", selectText);
+    // }
+
+    //console.log(boldHtml, selectHtml);
+
+    //this.editorRef.current.innerHTML = `${beforeContent}${boldHtml}${afterContent}`;
 
     this.setState({
       isSelection: false,
