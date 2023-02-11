@@ -41,3 +41,11 @@ React API:
 - useId
   => Tạo id tự động để làm việc với Form
 - Custom Hook => giống như việc xây dựng 1 component
+
+debouce => Thực hành làm chức năng search autocomplete
+
+assets: css, image,...css module,...
+
+Redux
+
+Project
