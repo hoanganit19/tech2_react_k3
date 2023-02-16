@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
+import Input from "./Input";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -74,26 +75,20 @@ const Products = () => {
       </div>
       <div>
         <form action="" onSubmit={handleSubmit}>
-          <p>
-            <input
-              type="text"
-              name="name"
-              placeholder="Name..."
-              required
-              onChange={handleChangeValue}
-              value={form.name}
-            />
-          </p>
-          <p>
-            <input
-              type="number"
-              name="price"
-              placeholder="Price..."
-              required
-              onChange={handleChangeValue}
-              value={form.price}
-            />
-          </p>
+          <Input
+            type="text"
+            name="name"
+            label="Tên"
+            value={form.name}
+            onChangeValue={handleChangeValue}
+          />
+          <Input
+            type="number"
+            name="price"
+            label="Giá"
+            value={form.price}
+            onChangeValue={handleChangeValue}
+          />
           <button type="submit">Add Product</button>
         </form>
       </div>

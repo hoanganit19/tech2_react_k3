@@ -5,7 +5,9 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import StateProvider from "./StateProvider/StateProvider";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const root = ReactDOM.createRoot(document.getElementById("root"), {
+  identifierPrefix: "unicode_",
+});
 root.render(
   <React.StrictMode>
     <StateProvider>
