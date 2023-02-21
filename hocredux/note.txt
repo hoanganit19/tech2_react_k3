@@ -19,3 +19,9 @@ Redux Tookit: Bản đóng gói của Redux
 
 - Seup nhanh hơn, code ngắn hơn
 - Khó hiểu hơn
+
+slice: createSlice()
+- Reducer 
+- Actions
+- Action Creator
+- Selector (Tự tạo)
