@@ -8,6 +8,15 @@ import {
   addTodoFetch,
 } from "./todosSlice";
 
+import todosStyle from "./Todos.module.scss";
+
+import clsx from "clsx";
+
+import logo from "../../logo.svg";
+import logo2 from "../../Images/logo.jpg";
+
+const { btn, "btn-success": btnSuccess } = todosStyle;
+
 const { addTodo } = todosActions;
 
 const Todos = () => {
@@ -15,7 +24,7 @@ const Todos = () => {
 
   const dispatch = useDispatch();
 
-  console.log(todos);
+  //console.log(todos);
 
   const handleAdd = () => {
     //dispatch(addTodo("Learn Redux"));
@@ -36,9 +45,11 @@ const Todos = () => {
     dispatch(fetchTodos());
   }, []);
 
+  const check = false;
+
   return (
     <div>
-      {loading === "pending" ? (
+      {/* {loading === "pending" ? (
         <p>Loading...</p>
       ) : (
         todos.map((todo) => {
@@ -46,9 +57,14 @@ const Todos = () => {
         })
       )}
 
-      {loadingAdd == "pending" ? <p>Đang thêm...</p> : false}
+      {loadingAdd == "pending" ? <p>Đang thêm...</p> : false} */}
 
-      <button onClick={handleAdd}>Add</button>
+      <button onClick={handleAdd} className={clsx(btn, check && btnSuccess)}>
+        Add
+      </button>
+
+      <img src={logo} />
+      <img src={logo2} />
     </div>
   );
 };
