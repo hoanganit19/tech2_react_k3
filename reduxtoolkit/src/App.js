@@ -4,6 +4,8 @@ import Todos from "./Components/Todos/Todos";
 
 console.log(process.env);
 
+console.log(process.env.REACT_APP_API_SERVER);
+
 function App() {
   return (
     <div>

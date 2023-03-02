@@ -35,3 +35,11 @@
 - Configs
 
 - Services
+
+# Những logic front-end KHÔNG được làm
+
+- Phân trang (Giới hạn)
+- Sắp xếp
+- Logic login
+- Filter
+- Tạo danh sách ngẫu nhiên
